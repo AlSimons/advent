@@ -108,7 +108,7 @@ OP_INPUT = 3
 OP_OUTPUT = 4
 OP_HALT = 99
 
-PARAM_MODE_INDIRECT = 0
+PARAM_MODE_POSITIONAL = 0
 PARAM_MODE_IMMEDIATE = 1
 
 
@@ -213,11 +213,11 @@ def decode_inst(pc, memory):
     def split_opcode(opcode):
         """
         Opcodes in the program may contain information about the mode of the
-        parameters, whether they are indirect or immediate. As a nested
+        parameters, whether they are positional or immediate. As a nested
         function this has access to the opcode definitions.
 
-        :param opcode: The opcode, which may contain parameter modes that need
-            to be separated out.
+        :param opcode: The opcode as contained in the program, which may
+            contain parameter modes that need to be separated out.
         :return: base_opcode, modes_list
         """
         base_opcode = opcode % 100
@@ -225,7 +225,7 @@ def decode_inst(pc, memory):
         modes_list = []
         # Have to use the known length of the operation's parameter list, since
         # the packed_modes value may not have a digit for each parameter.
-        # missing digits are mode zero (relative).
+        # missing digits are mode zero (positional).
         for n in range(len(op_defs[base_opcode]['p_locs'])):
             modes_list.append(packed_modes % 10)
             packed_modes = packed_modes // 10
@@ -252,7 +252,7 @@ def decode_inst(pc, memory):
     for idx, relative_parameter_loc in enumerate(op_def['p_locs']):
         absolute_parameter_loc = memory[relative_parameter_loc + pc]
         param_mode = param_modes[idx]
-        if param_mode == PARAM_MODE_INDIRECT:
+        if param_mode == PARAM_MODE_POSITIONAL:
             params.append(memory[absolute_parameter_loc])
         elif param_mode == PARAM_MODE_IMMEDIATE:
             params.append(absolute_parameter_loc)
