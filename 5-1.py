@@ -245,8 +245,7 @@ def decode_inst(pc, memory):
         print("Invalid opcode: {}".format(opcode), file=sys.stderr)
         halt([])
 
-    # Get the actual parameters (NB, sneak peek: This section will need
-    # to be changed in day 5's exercise.
+    # Get the actual parameters.
     params = []
 
     for idx, relative_parameter_loc in enumerate(op_def['p_locs']):
