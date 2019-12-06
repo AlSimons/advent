@@ -195,7 +195,7 @@ def execute(memory):
 
     while True:
         try:
-            opcode, params, op_function, result_loc, inst_width = \
+            params, op_function, result_loc, inst_width = \
                 decode_inst(pc, memory)
 
             # We know everything we need to execute the instruction.

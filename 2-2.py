@@ -52,11 +52,25 @@ OP_ADD = 1
 OP_MULTIPLY = 2
 OP_HALT = 99
 
-PARAM_1_POS = 1
-PARAM_2_POS = 2
-RESULT_POS = 3
 
-INSTRUCTION_WIDTH = 4
+class HaltException (Exception):
+    pass
+
+# Implement the instruction operations
+
+
+def add(params):
+    return params[0] + params[1]
+
+
+def multiply(params):
+    return params[0] * params[1]
+
+
+def halt(params):
+    # We're done.  Blow through the instruction decoder and catch this
+    # in the main execute() loop.
+    raise HaltException
 
 
 def decode_inst(pc, memory):
@@ -64,20 +78,71 @@ def decode_inst(pc, memory):
     decode a single instruction
     :param pc: the current program counter (location in memory)
     :param memory: the machine's memory
-    :return: (op, param_1_value, param_2_value, result_loc)
+    :return: (param_list, op_function, result_loc, instruction_width)
     """
+    #
+    # Describe each operation a dict keyed by opcode, of dicts:
+    #   {opcode: {
+    #       p_locs: [],
+    #       result_loc:,
+    #       op_function:,
+    #       instruction_width:,
+    #       },
+    #   }
+    #
+    op_defs = {
+        OP_ADD: {
+            'p_locs': [1, 2],
+            'result_loc': 3,
+            'op_function': add,
+            'instruction_width': 4,
+        },
+        OP_MULTIPLY: {
+            'p_locs': [1, 2],
+            'result_loc': 3,
+            'op_function': multiply,
+            'instruction_width': 4,
+        },
+        OP_HALT: {
+            'p_locs': [],
+            # Lie about the halt instruction's result location. It has no
+            # result, so it would seem that putting None here would be better.
+            # But that would require special case code below when we make
+            # the result location be relative to the pc because you can't add
+            # the pc to None.  The halt operation raises an exception, so
+            # the result location is never used.
+            'result_loc': 0,
+            'op_function': halt,
+            'instruction_width': 1,
+        }
+    }
+
     opcode = memory[pc]
-    if opcode != OP_HALT:
-        param_1_loc = memory[pc + PARAM_1_POS]
-        param_1_value = memory[param_1_loc]
-        param_2_loc = memory[pc + PARAM_2_POS]
-        param_2_value = memory[param_2_loc]
-        result_loc = memory[pc + RESULT_POS]
-    else:
-        param_1_value = None
-        param_2_value = None
-        result_loc = None
-    return opcode, param_1_value, param_2_value, result_loc
+
+    # Silence PyCharm warning use before def
+    op_def = None
+
+    try:
+        op_def = op_defs[opcode]
+    except KeyError:
+        # Oops! an invalid opcode. Report the error and halt.
+        print("Invalid opcode: {}".format(opcode), file=sys.stderr)
+        halt([])
+
+    # Get the actual parameters (NB, sneak peek: This section will need
+    # to be changed in day 5's exercise.
+    params = []
+    for relative_parameter_loc in op_def['p_locs']:
+        absolute_parameter_loc = memory[relative_parameter_loc + pc]
+        params.append(memory[absolute_parameter_loc])
+
+    result_loc = memory[op_def['result_loc'] + pc]
+
+    return (params,
+            op_def['op_function'],
+            result_loc,
+            op_def['instruction_width'],
+            )
 
 
 def execute(memory):
@@ -88,34 +153,20 @@ def execute(memory):
     """
     pc = 0
 
-    # Silence PyCharm warnings
-    result = None
-
     while True:
-        opcode, param_1, param_2, result_loc = decode_inst(pc, memory)
+        try:
+            params, op_function, result_loc, inst_width = \
+                decode_inst(pc, memory)
 
-        # Are we done?
-        if opcode == OP_HALT:
-            # Yes
+            # We know everything we need to execute the instruction.
+            result = op_function(params)
+            memory[result_loc] = result
+            #  memory[result_loc] = op_function(params)
+        except HaltException:
             return
 
-        # OP_ADD
-        elif opcode == OP_ADD:
-            result = param_1 + param_2
-
-        # OP_MULTIPLY
-        elif opcode == OP_MULTIPLY:
-            result = param_1 * param_2
-
-        # Undefined operation.  Report the error and exit.
-        else:
-            print("Unknown opcode '{}' encountered. Exiting.".format(opcode))
-
-        # Store the result
-        memory[result_loc] = result
-
         # Advance the PC
-        pc += INSTRUCTION_WIDTH
+        pc += inst_width
 
 
 def main():
@@ -132,6 +183,7 @@ def main():
                 print("Combined as requested: {}".format(noun * 100 + verb))
                 sys.exit()
     print("No such values were found")
+
 
 if __name__ == '__main__':
     main()
