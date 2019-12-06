@@ -118,7 +118,7 @@ def decode_inst(pc, memory):
     decode a single instruction
     :param pc: the current program counter (location in memory)
     :param memory: the machine's memory
-    :return: (op, param_list, op_function, result_loc, instruction_width)
+    :return: (param_list, op_function, result_loc, instruction_width)
     """
     #
     # Describe each operation a dict keyed by opcode, of dicts:
@@ -178,17 +178,7 @@ def decode_inst(pc, memory):
 
     result_loc = memory[op_def['result_loc'] + pc]
 
-    # At least at this stage, opcode isn't necessary to return,
-    # we'll leave it for now-- may rip it out downstream.
-
-    #DEBUG
-    print("Instruction: {}".format(memory[pc:pc + 4]))
-
-    print("  PC: {}, Op: {}, locs: {}, vals: {} Rl: {}".format(
-        pc, opcode, op_def['p_locs'], params, result_loc
-    ))
-    return (opcode,
-            params,
+    return (params,
             op_def['op_function'],
             result_loc,
             op_def['instruction_width'],
@@ -210,7 +200,6 @@ def execute(memory):
 
             # We know everything we need to execute the instruction.
             result = op_function(params)
-            print("    Result: {} stored at {}".format(result, result_loc))
             memory[result_loc] = result
             #  memory[result_loc] = op_function(params)
         except HaltException:
