@@ -217,35 +217,18 @@ def main():
                     prev = path[-1]
                 path.append(PathSegment(prev, segment))
 
-    print(first_path[0].location)
-
-    print([x.location for x in first_path])
-    print([x.location for x in second_path])
-
     # Now we have two complete paths.  Time to check for intersections.
     # Currently O(N^2). Could figure out some sorting mechanism and maybe
     # get more efficient.  But not now.
-    intersections = []
+    shortest = 999999999999999
+
     for segment_1 in first_path:
         for segment_2 in second_path:
             does_intersect, location = segment_1.intersects(segment_2)
             if does_intersect:
-                # The first segments "intersect" at the origin. Throw that
-                # one out.
-                if (not intersections) and \
-                    location.x == 0 and \
-                        location.y == 0:
-                    continue
-                intersections.append(location)
-
-    # Now we have a list of all the intersections.  Find the smallest
-    # manhattan distance (X + Y)
-    print(intersections)
-    shortest = abs(intersections[0].x) + abs(intersections[0].y)
-    for intersection in intersections[1:]:
-        possible = abs(intersection.x) + abs(intersection.y)
-        if possible < shortest:
-            shortest = possible
+                possible = location.x + location.y
+                if possible < shortest:
+                    shortest = possible
 
     # If I've done everything right, we can now print out the shortest
     # Manhattan distance, and move on to the next problem!
