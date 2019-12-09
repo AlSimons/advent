@@ -227,7 +227,8 @@ def main():
             does_intersect, location = segment_1.intersects(segment_2)
             if does_intersect:
                 possible = location.x + location.y
-                if possible < shortest:
+                # A distance of 0 happens at the very beginning, at the origin.
+                if possible < shortest and possible > 0:
                     shortest = possible
 
     # If I've done everything right, we can now print out the shortest
