@@ -58,7 +58,7 @@ Here are a few more examples:
 What is the Manhattan distance from the central port to the closest
 intersection?
 """
-import math
+
 
 class Point(object):
     """
@@ -130,7 +130,7 @@ class PathSegment(object):
         # Will evaluate to False if they are parallel, so we negate the value.
         if not (self.is_vertical() ^ other.is_vertical()):
             # They are the same direction,
-            return False, Point(0,0)
+            return False, Point(0, 0)
 
         # There is a possibility of a collision since they are perpendicular
         # Get self's values in the changing dimension and its constant value in
@@ -183,9 +183,9 @@ class PathSegment(object):
         # FINALLY!  We can tell if there is an intersection.
         if (other_lesser > my_fixed) or (my_fixed > other_greater):
             # No possibility of an intersection
-            return False, Point(0,0)
+            return False, Point(0, 0)
         if (my_lesser > other_fixed) or (other_fixed > my_greater):
-            return False, Point(0,0)
+            return False, Point(0, 0)
 
         # OK, there is an intersection, at the two fixed coordinates
         if self.is_vertical():
@@ -197,6 +197,7 @@ class PathSegment(object):
 
     def __repr__(self):
         return "Loc {}, Prev loc {}".format(self.location, self.prev_location)
+
 
 def main():
     """
@@ -251,6 +252,7 @@ def main():
     print("The shortest Manhattan distance is {}".format(shortest))
 
     # That's all, folks!
+
 
 if __name__ == '__main__':
     main()
