@@ -49,7 +49,7 @@ What message is produced after decoding your image?
 """
 
 
-def make_int0_pic(layer, rows, columns):
+def make_into_pic(layer, rows, columns):
     """
     Do two things.
     1. Break into rows of columns length, and
