@@ -58,7 +58,26 @@ def equals(params):
         return 0
 
 
+#
+# If we were building this in an OO manner, this would be a class variable.
+# For the purposes of this exercise, it is global.
+relative_base = 0
+
+
+def adjust_relative_base(params):
+    global relative_base
+    relative_base += params[0]
+
+
+def get_relative_base():
+    return relative_base
+
+
 def halt(params):
+    global relative_base
+    # Reset the relative_base, in case we get invoked multiple times.
+    relative_base = 0
+
     # We're done.  Blow through the instruction decoder and catch this
     # in the main execute() loop.
     raise HaltException

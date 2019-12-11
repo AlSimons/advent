@@ -9,10 +9,12 @@ OP_JUMP_IF_TRUE = 5
 OP_JUMP_IF_FALSE = 6
 OP_LESS_THAN = 7
 OP_EQUALS = 8
+OP_ADJUST_RELATIVE_BASE = 9
 OP_HALT = 99
 
 PARAM_MODE_POSITIONAL = 0
 PARAM_MODE_IMMEDIATE = 1
+PARAM_MODE_RELATIVE = 2
 
 RETURN_LOCATION_PC = -1
 
@@ -39,20 +41,8 @@ OP_DEFS = {
         'op_function': op.multiply,
         'instruction_width': 4,
     },
-    OP_HALT: {
-        'p_locs': [],
-        # Lie about the halt instruction's result location. It has no
-        # result, so it would seem that putting None here would be better.
-        # But that would require special case code below when we make
-        # the result location be relative to the pc because you can't add
-        # the pc to None.  The halt operation raises an exception, so
-        # the result location is never used.
-        'result_loc': 0,
-        'op_function': op.halt,
-        'instruction_width': 1,
-    },
     OP_INPUT: {
-        'p_locs': [],
+        'p_locs': [1],
         'result_loc': 1,
         'op_function': op.input_func,
         'instruction_width': 2,
@@ -89,6 +79,24 @@ OP_DEFS = {
         'result_loc': 3,
         'op_function': op.equals,
         'instruction_width': 4,
+    },
+    OP_ADJUST_RELATIVE_BASE: {
+        'p_locs': [1],
+        'result_loc': 1,
+        'op_function': op.adjust_relative_base,
+        'instruction_width': 2,
+    },
+    OP_HALT: {
+        'p_locs': [],
+        # Lie about the halt instruction's result location. It has no
+        # result, so it would seem that putting None here would be better.
+        # But that would require special case code below when we make
+        # the result location be relative to the pc because you can't add
+        # the pc to None.  The halt operation raises an exception, so
+        # the result location is never used.
+        'result_loc': 0,
+        'op_function': op.halt,
+        'instruction_width': 1,
     },
 }
 
