@@ -80,7 +80,9 @@ location at 11,13):
 The Elves are placing bets on which will be the 200th asteroid to be
 vaporized. Win the bet by determining which asteroid that will be; what do
 you get if you multiply its X coordinate by 100 and then add its Y
-coordinate? (For example, 8,2 becomes 802.) """
+coordinate? (For example, 8,2 becomes 802.)
+"""
+
 import math  # for atan2()
 
 
@@ -215,7 +217,7 @@ def main():
     my_y = 19
 
     if not data[my_y][my_x]:
-        raise ValueError("Huh? We;re not on an asteroid!")
+        raise ValueError("Huh? We're not on an asteroid!")
 
     all_asteroids = scan_skies(data, my_y, my_x)
 
@@ -245,6 +247,9 @@ def main():
                 print("The two hundredth asteroid was ({}, {})".format(
                     asteroid[1], asteroid[2]
                 ))
+                # We could return now to terminate the program, but we'll
+                # keep blasting the asteroids BECAUSE IT'S FUN!!!!
+
             index += 1
             count += 1
         except IndexError:
